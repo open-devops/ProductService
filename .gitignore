@@ -1,0 +1,10 @@
+.mvn/
+.settings/
+target/
+.classpath
+.project
+.springBeans
+.travis.yml
+docker-compose.yml
+mvnw
+mvnw.cmd
