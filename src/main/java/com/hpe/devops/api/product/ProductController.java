@@ -1,6 +1,9 @@
 package com.hpe.devops.api.product;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +37,24 @@ public class ProductController {
 	}
 	
 	@RequestMapping(value = "/organization/{organizationId}", method = RequestMethod.GET)
-	public List<Product> getAllProductsByOrgId(@PathVariable String organizationId) throws Exception {
+	public Map<String, List<Product>> getAllProductsByOrgId(@PathVariable String organizationId) throws Exception {
 		
-		return productRepo.findByOrganizationId(organizationId);
+		List<Product> productList = productRepo.findByOrganizationId(organizationId);
+		
+		Map<String, List<Product>> productMap = new HashMap<String, List<Product>>();
+		
+		for (Product product : productList){
+			if( !productMap.containsKey(product.getName())){
+				List<Product> tmpList = new ArrayList<Product>();
+				tmpList.add(product);
+				productMap.put(product.getName(), tmpList);
+				
+			}else{
+				productMap.get(product.getName()).add(product);
+			}
+		}
+		
+		return productMap;
 		
 	}
 	
@@ -60,7 +78,8 @@ public class ProductController {
 	
 		product.setId(UUID.randomUUID().toString());
 		
-		product.setPipelineId(UUID.randomUUID().toString());
+		product.setPipelineId(product.getId());
+		
 		product = productRepo.save(product);
 				
 		return new ResponseEntity<Product>(product, HttpStatus.CREATED);
